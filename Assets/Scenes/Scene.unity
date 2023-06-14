@@ -384,6 +384,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 890f596ad58a0e747b975f8fb24767b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 526753307576256837, guid: e733c65eec82aa347a5d43bd2581ba60, type: 3}
   rows: 10
   cols: 7
 --- !u!114 &2018853141
