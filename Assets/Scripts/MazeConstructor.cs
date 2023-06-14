@@ -1,4 +1,5 @@
 using System.Threading;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class MazeConstructor : MonoBehaviour
@@ -11,6 +12,9 @@ public class MazeConstructor : MonoBehaviour
     [SerializeField] private Material treasureMat;
     public float placementThreshold = 0.1f; // chance of an empty space
     private MazeMeshGenerator meshGenerator;
+    public float hallWidth { get; private set; }
+    public int goalRow { get; private set; }
+    public int goalCol { get; private set; }
 
     public int[,] data
     {
@@ -20,6 +24,7 @@ public class MazeConstructor : MonoBehaviour
     private void Awake()
     {
         meshGenerator = new MazeMeshGenerator();
+        hallWidth = meshGenerator.width;
 
         // default the walls surrounding a single empty cell
         data = new int[,]
@@ -32,12 +37,17 @@ public class MazeConstructor : MonoBehaviour
 
     public void GenerateNewMaze(int sizeRows, int sizeCols)
     {
+        DisposeMaze();
+
         if(sizeRows % 2 == 0 && sizeCols % 2 == 0)
         {
             Debug.LogError("Odd numbers work better for dungeon size.");
         }
 
         data = FromDimensions(sizeRows, sizeCols);
+
+        goalRow = data.GetUpperBound(0) - 1;
+        goalCol = data.GetUpperBound(1) - 1;
 
         DisplayMaze();
     }
@@ -87,6 +97,15 @@ public class MazeConstructor : MonoBehaviour
 
         MeshRenderer mr = go.AddComponent<MeshRenderer>();
         mr.materials = new Material[2] { mazeMat1, mazeMat2 };
+    }
+
+    public void DisposeMaze()
+    {
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("Generated");
+        foreach(GameObject go in objects)
+        {
+            Destroy(go);
+        }
     }
 
     private void OnGUI()
