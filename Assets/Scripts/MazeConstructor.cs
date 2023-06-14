@@ -10,6 +10,7 @@ public class MazeConstructor : MonoBehaviour
     [SerializeField] private Material startMat;
     [SerializeField] private Material treasureMat;
     public float placementThreshold = 0.1f; // chance of an empty space
+    private MazeMeshGenerator meshGenerator;
 
     public int[,] data
     {
@@ -18,6 +19,8 @@ public class MazeConstructor : MonoBehaviour
 
     private void Awake()
     {
+        meshGenerator = new MazeMeshGenerator();
+
         // default the walls surrounding a single empty cell
         data = new int[,]
         {
@@ -35,6 +38,8 @@ public class MazeConstructor : MonoBehaviour
         }
 
         data = FromDimensions(sizeRows, sizeCols);
+
+        DisplayMaze();
     }
 
     public int[,] FromDimensions(int sizeRows, int sizeCols)
@@ -65,6 +70,23 @@ public class MazeConstructor : MonoBehaviour
         }
 
         return maze;
+    }
+
+    private void DisplayMaze()
+    {
+        GameObject go = new GameObject();
+        go.transform.position = Vector3.zero;
+        go.name = "Procedural Maze";
+        go.tag = "Generated";
+
+        MeshFilter mf = go.AddComponent<MeshFilter>();
+        mf.mesh = meshGenerator.FromData(data);
+
+        MeshCollider mc = go.AddComponent<MeshCollider>();
+        mc.sharedMesh = mf.mesh;
+
+        MeshRenderer mr = go.AddComponent<MeshRenderer>();
+        mr.materials = new Material[2] { mazeMat1, mazeMat2 };
     }
 
     private void OnGUI()
