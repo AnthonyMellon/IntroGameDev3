@@ -21,6 +21,11 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
+        StartNewGame();
+    }
+
+    private void StartNewGame()
+    {
         constructor.GenerateNewMaze(rows, cols, OnTreasureTrigger);
         aIController.Graph = constructor.graph;
         aIController.Player = CreatePlayer();
@@ -60,6 +65,7 @@ public class GameController : MonoBehaviour
     private void OnMonsterTrigger(GameObject trigger, GameObject other)
     {
         Debug.Log("The monster got you :(");
+        StartNewGame();
     }
 
 }
