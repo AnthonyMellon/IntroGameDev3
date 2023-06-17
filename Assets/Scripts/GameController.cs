@@ -24,7 +24,7 @@ public class GameController : MonoBehaviour
         constructor.GenerateNewMaze(rows, cols, OnTreasureTrigger);
         aIController.Graph = constructor.graph;
         aIController.Player = CreatePlayer();
-        aIController.Monster = CreateMonster();
+        aIController.Monster = CreateMonster(OnMonsterTrigger);
         aIController.HallWidth = constructor.hallWidth;
         aIController.StartAI();
     }
@@ -37,7 +37,7 @@ public class GameController : MonoBehaviour
         return player;
     }
 
-    private GameObject CreateMonster()
+    private GameObject CreateMonster(TriggerEventHandler onKillCallback)
     {
         Vector3 monsterPosition = new Vector3(
             constructor.goalCol * constructor.hallWidth,
@@ -45,6 +45,8 @@ public class GameController : MonoBehaviour
             constructor.goalRow * constructor.hallWidth);
 
         GameObject monster = Instantiate(monsterPrefab, monsterPosition, Quaternion.identity);
+        TriggerEventRouter tc = monster.GetComponent<TriggerEventRouter>();
+        tc.callback = onKillCallback;
         monster.tag = "Generated";
         return monster;
     }
@@ -53,6 +55,11 @@ public class GameController : MonoBehaviour
     {
         Debug.Log("You Won!");
         aIController.StopAI();
+    }
+
+    private void OnMonsterTrigger(GameObject trigger, GameObject other)
+    {
+        Debug.Log("The monster got you :(");
     }
 
 }
