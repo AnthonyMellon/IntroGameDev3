@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public class GameController : MonoBehaviour
     public GameObject playerPrefab;
     public GameObject monsterPrefab;
     private AIController aIController;
+    private List<GameObject> waypoints = new List<GameObject>();
 
     [SerializeField] private int rows;
     [SerializeField] private int cols;
@@ -22,6 +24,15 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         StartNewGame();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown("f"))
+        {
+            Debug.Log("Helping the player find the exit");
+            CreateWayPointPath();
+        }
     }
 
     private void StartNewGame()
@@ -54,6 +65,47 @@ public class GameController : MonoBehaviour
         tc.callback = onKillCallback;
         monster.tag = "Generated";
         return monster;
+    }
+
+    private GameObject CreateWaypoint(Vector3 position)
+    {
+        GameObject waypoint = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        waypoint.GetComponent<SphereCollider>().enabled = false;
+        waypoint.transform.position = position;
+        waypoint.name = "Waypoint";
+        waypoint.tag = "Generated";
+
+        return waypoint;
+    }
+
+    private void CreateWayPointPath()
+    {
+        DestroyAllWaypoints();
+
+        int playerCol = Mathf.RoundToInt(aIController.Player.transform.position.x / aIController.HallWidth);
+        int playerRow = Mathf.RoundToInt(aIController.Player.transform.position.z / aIController.HallWidth);        
+
+        //Debug.Log($"Finding path from {playerCol} {playerCol} to {endPosition.x} {endPosition.y}");
+        List<Node> path = aIController.FindPath(playerRow, playerCol, constructor.goalRow, constructor.goalCol);
+
+        for(int i = 0; i < path.Count; i++)
+        {
+            Node node = path[i];
+            Vector3 position = new Vector3(node.y * constructor.hallWidth, 0.5f, node.x * constructor.hallWidth);
+            waypoints.Add(CreateWaypoint(position));
+        }
+    }
+
+    private void DestroyAllWaypoints()
+    {
+        if (waypoints.Count == 0) return;
+
+        for(int i = 0; i < waypoints.Count; i++)
+        {
+            Destroy(waypoints[i]);            
+        }
+         
+        waypoints = new List<GameObject>();
     }
 
     private void OnTreasureTrigger(GameObject trigger, GameObject other)

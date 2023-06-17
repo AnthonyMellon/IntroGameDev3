@@ -136,7 +136,7 @@ public class AIController : MonoBehaviour
     }
 
     public List<Node> FindPath(int startX, int startY, int endX, int endY)
-    {
+    {        
         Node startNode = graph[startX, startY];
         Node endNode = graph[endX, endY];
 
